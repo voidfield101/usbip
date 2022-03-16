@@ -14,7 +14,7 @@ pub struct UsbEndpoint {
 }
 
 impl UsbEndpoint {
-    pub(crate) fn direction(&self) -> Direction {
+    pub fn direction(&self) -> Direction {
         if self.address & 0x80 != 0 {
             Direction::In
         } else {
