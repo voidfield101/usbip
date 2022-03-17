@@ -20,11 +20,11 @@ pub struct UsbDevice {
     pub(crate) ep0_in: UsbEndpoint,
     pub(crate) ep0_out: UsbEndpoint,
     // strings
-    pub(crate) string_pool: HashMap<u8, String>,
-    pub(crate) string_configuration: u8,
-    pub(crate) string_manufacturer: u8,
-    pub(crate) string_product: u8,
-    pub(crate) string_serial: u8,
+    pub string_pool: HashMap<u8, String>,
+    pub string_configuration: u8,
+    pub string_manufacturer: u8,
+    pub string_product: u8,
+    pub string_serial: u8,
 }
 
 impl UsbDevice {
@@ -81,7 +81,7 @@ impl UsbDevice {
         self
     }
 
-    pub(crate) fn new_string(&mut self, s: &str) -> u8 {
+    pub fn new_string(&mut self, s: &str) -> u8 {
         for i in 1.. {
             if self.string_pool.get(&i).is_none() {
                 self.string_pool.insert(i, s.to_string());
