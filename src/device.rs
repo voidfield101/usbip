@@ -59,7 +59,7 @@ impl UsbDevice {
         res
     }
 
-    pub fn with_interface(
+    pub async fn with_interface(
         mut self,
         interface_class: u8,
         interface_subclass: u8,
@@ -69,7 +69,7 @@ impl UsbDevice {
         handler: Arc<Mutex<Box<dyn UsbInterfaceHandler + Send>>>,
     ) -> Self {
         let string_interface = self.new_string(name);
-        let class_specific_descriptor = handler.blocking_lock().get_class_specific_descriptor();
+        let class_specific_descriptor = handler.lock().await.get_class_specific_descriptor();
         self.interfaces.push(UsbInterface {
             interface_class,
             interface_subclass,
