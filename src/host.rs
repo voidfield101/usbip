@@ -1,5 +1,6 @@
 //! Host USB
 use super::*;
+use async_trait::async_trait;
 use rusb::{GlobalContext,DeviceHandle};
 
 /// A handler to pass requests to a USB device of the host
@@ -14,8 +15,9 @@ impl UsbHostHandler {
     }
 }
 
+#[async_trait]
 impl UsbInterfaceHandler for UsbHostHandler {
-    fn handle_urb(
+    async fn handle_urb(
         &mut self,
         _interface: &UsbInterface,
         ep: UsbEndpoint,

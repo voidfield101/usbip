@@ -1,4 +1,6 @@
 //! Implement HID device
+use async_trait::async_trait;
+
 use super::*;
 
 // reference:
@@ -84,8 +86,9 @@ impl UsbHidKeyboardHandler {
     }
 }
 
+#[async_trait]
 impl UsbInterfaceHandler for UsbHidKeyboardHandler {
-    fn handle_urb(
+    async fn handle_urb(
         &mut self,
         _interface: &UsbInterface,
         ep: UsbEndpoint,

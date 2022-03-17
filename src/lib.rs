@@ -81,7 +81,7 @@ impl UsbIpServer {
                     }
 
                     let handler =
-                        Arc::new(Mutex::new(Box::new(UsbHostHandler::new(handle.clone()))
+                        Arc::new(tokio::sync::Mutex::new(Box::new(UsbHostHandler::new(handle.clone()))
                             as Box<dyn UsbInterfaceHandler + Send>));
                     interfaces.push(UsbInterface {
                         interface_class: intf_desc.class_code(),
@@ -89,7 +89,7 @@ impl UsbIpServer {
                         interface_protocol: intf_desc.protocol_code(),
                         endpoints,
                         string_interface: intf_desc.description_string_index().unwrap_or(0),
-                        class_specific_descriptor: Vec::from(intf_desc.extra().unwrap_or(&[])),
+                        class_specific_descriptor: Vec::from(intf_desc.extra()),
                         handler,
                     });
                 }
@@ -292,7 +292,7 @@ async fn handler<T: AsyncReadExt + AsyncWriteExt + Unpin>(
 pub async fn server(addr: SocketAddr, server: UsbIpServer) {
     let listener = TcpListener::bind(addr).await.expect("bind to addr");
 
-    let server = async move {
+    let server_future = async move {
         let usbip_server = Arc::new(server);
         loop {
             match listener.accept().await {
@@ -311,7 +311,7 @@ pub async fn server(addr: SocketAddr, server: UsbIpServer) {
         }
     };
 
-    server.await
+    server_future.await
 }
 
 #[cfg(test)]

@@ -1,4 +1,6 @@
 //! Implement CDC(Communications) device
+use async_trait::async_trait;
+
 use super::*;
 
 /// A handler of a CDC ACM(Abstract Control Model)
@@ -42,8 +44,9 @@ impl UsbCdcAcmHandler {
     }
 }
 
+#[async_trait]
 impl UsbInterfaceHandler for UsbCdcAcmHandler {
-    fn handle_urb(
+    async fn handle_urb(
         &mut self,
         _interface: &UsbInterface,
         ep: UsbEndpoint,

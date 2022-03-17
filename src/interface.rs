@@ -1,4 +1,7 @@
+use async_trait::async_trait;
 use super::*;
+
+use tokio::sync::Mutex;
 
 /// Represent a USB interface
 #[derive(Clone)]
@@ -13,6 +16,7 @@ pub struct UsbInterface {
 }
 
 /// A handler of a custom usb interface
+#[async_trait]
 pub trait UsbInterfaceHandler {
     /// Return the class specific desciptor which is inserted between interface descriptor and endpoint descriptor
     fn get_class_specific_descriptor(&self) -> Vec<u8>;
@@ -20,7 +24,7 @@ pub trait UsbInterfaceHandler {
     /// Handle a URB(USB Request Block) targeting at this interface
     ///
     /// Can be one of: control transfer to ep0 or other types of transfer to its endpoint
-    fn handle_urb(
+    async fn handle_urb(
         &mut self,
         interface: &UsbInterface,
         ep: UsbEndpoint,

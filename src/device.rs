@@ -1,4 +1,5 @@
 use super::*;
+use tokio::sync::Mutex;
 
 /// Represent a USB device
 #[derive(Clone, Default)]
@@ -68,7 +69,7 @@ impl UsbDevice {
         handler: Arc<Mutex<Box<dyn UsbInterfaceHandler + Send>>>,
     ) -> Self {
         let string_interface = self.new_string(name);
-        let class_specific_descriptor = handler.lock().unwrap().get_class_specific_descriptor();
+        let class_specific_descriptor = handler.blocking_lock().get_class_specific_descriptor();
         self.interfaces.push(UsbInterface {
             interface_class,
             interface_subclass,
@@ -349,8 +350,8 @@ impl UsbDevice {
                         // see https://www.beyondlogic.org/usbnutshell/usb6.shtml
                         // only low 8 bits are valid
                         let intf = &self.interfaces[setup_packet.index as usize & 0xFF];
-                        let mut handler = intf.handler.lock().unwrap();
-                        let resp = handler.handle_urb(intf, ep, setup_packet, &out_data)?;
+                        let mut handler = intf.handler.lock().await;
+                        let resp = handler.handle_urb(intf, ep, setup_packet, &out_data).await?;
                         return Ok(resp);
                     }
                     _ => unimplemented!("control in"),
@@ -363,8 +364,8 @@ impl UsbDevice {
             (Some(_), _) => {
                 // others
                 let intf = intf.unwrap();
-                let mut handler = intf.handler.lock().unwrap();
-                let resp = handler.handle_urb(intf, ep, setup_packet, &out_data)?;
+                let mut handler = intf.handler.lock().await;
+                let resp = handler.handle_urb(intf, ep, setup_packet, &out_data).await?;
                 return Ok(resp);
             }
             _ => unimplemented!("transfer to {:?}", ep),
