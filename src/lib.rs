@@ -273,13 +273,15 @@ async fn handler<T: AsyncReadExt + AsyncWriteExt + Unpin>(
 
                 // USBIP_RET_UNLINK
                 // command
+                /*
                 socket.write_u32(0x4).await?;
                 socket.write_u32(seq_num).await?;
                 socket.write_u32(dev_id).await?;
                 socket.write_u32(direction).await?;
                 socket.write_u32(ep).await?;
+                */
                 // status
-                socket.write_u32(0).await?;
+                //socket.write_u32(0).await?;
             }
             _ => warn!("Got unknown command {:?}", command),
         }
